@@ -9,7 +9,6 @@ import { Formatter } from './formatter.js';
 import { ImageHelper } from './imageHelper.js';
 import { UIHelper } from './uiHelper.js';
 import { renderDashboard } from './ui.js';
-
 // --- CAPTURA DE ERRORES ---
 window.addEventListener('error', (event) => {
     console.error('ERROR GLOBAL:', event.error || event.message);
