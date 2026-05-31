@@ -2,42 +2,30 @@ import { StoreActions } from './storeActions.js';
 import { renderDashboard } from './ui.js';
 import { UIHelper } from './uiHelper.js';
 
-// Manejo de errores globales
-window.addEventListener('error', (event) => console.error('ERROR GLOBAL:', event.error));
-window.addEventListener('unhandledrejection', (event) => console.error('PROMESA RECHAZADA:', event.reason));
-
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Aplicación iniciada');
+    console.log('Iniciando Tienda Sinaí...');
+    
+    // UIHelper puede ser undefined al principio, usamos encadenamiento opcional
+    UIHelper?.showToast?.('Conectando a la base de datos...');
 
     try {
-        UIHelper?.showToast('Conectando con la nube...');
-
-        // Asegúrate de que esta función en StoreActions sea capaz de
-        // ejecutar el callback tanto en la carga inicial como en cambios
-        StoreActions.sincronizarDatos((datos) => {
-            if (datos) {
-                console.log('Datos recibidos para renderizar:', datos);
-                renderDashboard(datos);
-            } else {
-                console.warn('No se recibieron datos de la base de datos');
-            }
+        await StoreActions.sincronizarDatos((datos) => {
+            console.log('Datos recibidos, renderizando UI...');
+            renderDashboard(datos);
         });
-
     } catch (error) {
-        console.error('Error al iniciar la sincronización:', error);
-        UIHelper?.showToast('Error al conectar con la base de datos');
+        console.error('Error al conectar:', error);
+        UIHelper?.showToast?.('Error al conectar con la nube');
     }
 });
 
-// Eventos de botones con manejo de errores interno
+// Evento de venta (ejemplo)
 document.getElementById('btn-confirmar-venta')?.addEventListener('click', async () => {
     try {
-        UIHelper?.showToast('Procesando venta...');
-        // Tu lógica aquí:
-        // await StoreActions.registrarVenta(...);
-        UIHelper?.showToast('Venta confirmada exitosamente');
+        UIHelper?.showToast?.('Procesando...');
+        // Aquí llamarías a recordSale después de obtener los datos del form
+        UIHelper?.showToast?.('Venta registrada');
     } catch (error) {
-        console.error('Error en venta:', error);
-        UIHelper?.showToast('Error al procesar la venta');
+        console.error('Error:', error);
     }
 });
