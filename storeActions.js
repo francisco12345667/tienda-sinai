@@ -2,22 +2,26 @@ import { supabase } from './db.js';
 
 export const StoreActions = {
     sincronizarDatos: async (callback) => {
-        // Usamos 'producto' (singular)
-        const { data } = await supabase.from('producto').select('*');
-        if (data) callback(data);
+        try {
+            // 1. Carga inicial de datos
+            const { data, error } = await supabase.from('producto').select('*');
+            if (error) throw error;
+            if (data) callback(data);
 
-        return supabase
-            .channel('public:producto')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'producto' }, () => {
-                supabase.from('producto').select('*').then(({ data }) => {
-                    if (data) callback(data);
-                });
-            })
-            .subscribe();
+            // 2. Suscripción a cambios en tiempo real
+            return supabase
+                .channel('realtime:producto')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'producto' }, async () => {
+                    const { data: newData } = await supabase.from('producto').select('*');
+                    if (newData) callback(newData);
+                })
+                .subscribe();
+        } catch (err) {
+            console.error("Error en sincronización:", err);
+        }
     },
 
     recordSale: async (venta) => {
-        // Asegúrate de tener una tabla llamada 'ventas' en Supabase
         const { data, error } = await supabase.from('ventas').insert([venta]);
         if (error) throw error;
         return data;
@@ -27,16 +31,6 @@ export const StoreActions = {
         const { data, error } = await supabase.from('producto').upsert([producto]);
         if (error) throw error;
         return data;
-    },
-
-    saveProductPhoto: async (productId, file) => {
-        const filePath = `producto/${productId}/${Date.now()}.jpg`;
-        const { error } = await supabase.storage
-            .from('imagenes')
-            .upload(filePath, file);
-        if (error) throw error;
-        
-        return supabase.storage.from('imagenes').getPublicUrl(filePath).data.publicUrl;
     },
 
     deleteProduct: async (id) => {
