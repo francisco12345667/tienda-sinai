@@ -1,27 +1,31 @@
 export function renderDashboard(datos) {
-    console.log("Intentando mostrar en pantalla:", datos);
     const container = document.getElementById('dashboard-container');
     
     if (!container) {
-        console.error("¡No encuentro el div con ID 'dashboard-container'!");
+        console.error("No se encontró el contenedor con ID 'dashboard-container'");
         return;
     }
 
-    // Limpiamos
-    container.innerHTML = '<h2>Lista de Productos:</h2>';
+    // Limpiamos el contenedor antes de renderizar
+    container.innerHTML = '<h2>Inventario Actual</h2>';
 
-    // Dibujamos
+    // Si no hay datos, mostramos un mensaje amigable
+    if (!datos || datos.length === 0) {
+        container.innerHTML += '<p>No hay productos registrados.</p>';
+        return;
+    }
+
+    // Dibujamos cada producto
     datos.forEach(producto => {
         const item = document.createElement('div');
-        // Usamos estilos en línea para asegurar que no sea un problema de CSS
-        item.style.border = "2px solid red";
-        item.style.margin = "10px";
-        item.style.padding = "10px";
+        item.className = 'producto-card'; // Clase para tu CSS
+        
         item.innerHTML = `
-            <strong>Nombre: ${producto.nombre}</strong><br>
-            Precio: $${producto.precio}<br>
-            Stock: ${producto.stock}
+            <h3>${producto.nombre}</h3>
+            <p>Precio: <strong>$${producto.precio}</strong></p>
+            <p>Stock disponible: <span>${producto.stock} unidades</span></p>
         `;
+        
         container.appendChild(item);
     });
 }
