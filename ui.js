@@ -1,31 +1,33 @@
-export function renderDashboard(datos) {
+// ui.js
+export function renderDashboard(productos) {
     const container = document.getElementById('dashboard-container');
     
+    // Verificación de seguridad
     if (!container) {
-        console.error("No se encontró el contenedor con ID 'dashboard-container'");
+        console.error("ERROR: No encontré el elemento con id 'dashboard-container'");
         return;
     }
 
-    // Limpiamos el contenedor antes de renderizar
-    container.innerHTML = '<h2>Inventario Actual</h2>';
+    // Limpiamos lo que haya antes para no duplicar datos
+    container.innerHTML = '<h2>Inventario de Productos</h2>';
 
-    // Si no hay datos, mostramos un mensaje amigable
-    if (!datos || datos.length === 0) {
-        container.innerHTML += '<p>No hay productos registrados.</p>';
+    // Si no hay productos, avisamos
+    if (!productos || productos.length === 0) {
+        container.innerHTML += '<p>No hay productos en la base de datos.</p>';
         return;
     }
 
     // Dibujamos cada producto
-    datos.forEach(producto => {
+    productos.forEach(producto => {
         const item = document.createElement('div');
-        item.className = 'producto-card'; // Clase para tu CSS
-        
+        item.style.marginBottom = "10px";
+        item.style.padding = "10px";
+        item.style.border = "1px solid #ddd";
+        // Asegúrate de que 'nombre' y 'stock' coincidan con los nombres de tus columnas en Supabase
         item.innerHTML = `
-            <h3>${producto.nombre}</h3>
-            <p>Precio: <strong>$${producto.precio}</strong></p>
-            <p>Stock disponible: <span>${producto.stock} unidades</span></p>
+            <strong>${producto.nombre || 'Producto sin nombre'}</strong>
+            <br>Stock: ${producto.stock !== undefined ? producto.stock : 'N/A'}
         `;
-        
         container.appendChild(item);
     });
 }
