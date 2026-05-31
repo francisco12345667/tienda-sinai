@@ -1,5 +1,14 @@
 // main.js
-console.log("¡main.js se está cargando!");
+async function iniciarApp() {
+    console.log("Iniciando aplicación...");
+    try {
+        const datos = await obtenerProductosDesdeSupabase(); // Tu función de carga
+        renderDashboard(datos);
+    } catch (error) {
+        console.error("Error al cargar datos iniciales:", error);
+    }
+}
+iniciarApp();
 
 // Al estar todos en la misma carpeta, quitamos '/db/', '/services/', etc.
 import { StoreActions } from './storeActions.js';
