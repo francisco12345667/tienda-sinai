@@ -1,13 +1,16 @@
+// main.js
 console.log("¡main.js se está cargando!");
-import { StoreActions } from './db/storeActions.js';
-import { ProductService } from './services/product.service.js';
-import { SaleService } from './services/sale.service.js';
-import { Formatter } from './utils/formatter.js';
-import { ImageHelper } from './utils/imageHelper.js';
-import { UIHelper } from './utils/uiHelper.js';
+
+// Al estar todos en la misma carpeta, quitamos '/db/', '/services/', etc.
+import { StoreActions } from './storeActions.js';
+import { ProductService } from './product.service.js';
+import { SaleService } from './sale.service.js';
+import { Formatter } from './formatter.js';
+import { ImageHelper } from './imageHelper.js';
+import { UIHelper } from './uiHelper.js';
 import { renderDashboard } from './ui.js';
 
-// --- CAPTURA DE ERRORES (Mantén esto, es vital) ---
+// --- CAPTURA DE ERRORES ---
 window.addEventListener('error', (event) => {
     console.error('ERROR GLOBAL:', event.error || event.message);
 });
@@ -17,38 +20,27 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // --- INICIALIZACIÓN ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Aplicación iniciada con Supabase');
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Aplicación iniciada');
 
     try {
         UIHelper?.showToast('Conectando con la nube...');
-        console.log('Iniciando escucha en tiempo real...');
 
-        // La función de StoreActions ahora conecta a Supabase
+        // Sincronización continua
         StoreActions.sincronizarDatos((datos) => {
-            console.log('Datos recibidos desde Supabase:', datos);
-            
+            console.log('Datos recibidos:', datos);
             if (typeof renderDashboard === 'function') {
                 renderDashboard(datos);
-            } else {
-                console.error('renderDashboard no está definido');
             }
         });
 
     } catch (error) {
-        console.error('Error crítico al iniciar:', error);
+        console.error('Error al iniciar:', error);
     }
 });
 
 // --- EVENTOS DE INTERFAZ ---
 document.getElementById('btn-confirmar-venta')?.addEventListener('click', async () => {
-    try {
-        console.log('Procesando venta...');
-        // Ejemplo de uso de las nuevas funciones de Supabase
-        // const resultado = await StoreActions.recordSale(venta);
-        UIHelper.showToast('Venta registrada con éxito');
-    } catch (error) {
-        console.error('Error al confirmar venta:', error);
-        UIHelper.showToast('Error al procesar la venta');
-    }
+    UIHelper?.showToast('Procesando venta...');
+    // ... resto de tu lógica
 });
