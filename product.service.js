@@ -1,11 +1,9 @@
-import { StoreActions } from '../../db/storeActions';
+// 1. PRIMERO: Los imports (siempre arriba)
+import { StoreActions } from './storeActions.js';
 
+// 2. DESPUÉS: Tu código y funciones (el export va aquí)
 export const ProductService = {
-  // Lógica para abrir paca y distribuir stock
   async abrirPaca(pacaId, items) {
-    // 1. Obtener paca y productos
-    // 2. Realizar cálculos (ej: sumar stock a productos existentes)
-    // 3. Persistir cambios
     await StoreActions.updatePacaStatus(pacaId, 'abierta');
     return await StoreActions.incrementarStockMultiple(items);
   },
