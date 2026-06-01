@@ -1,36 +1,30 @@
 export function renderDashboard(productos) {
+    // 1. Buscamos el contenedor donde queremos que aparezcan los datos
     const container = document.getElementById('dashboard-container');
     
     if (!container) {
-        console.error("No encontré #dashboard-container");
+        console.error("No se encontró el elemento 'dashboard-container' en tu HTML.");
         return;
     }
 
-    // Limpiamos antes de dibujar
-    container.innerHTML = '<h2>Inventario Actual</h2>';
+    // 2. Limpiamos y preparamos el área
+    container.style.display = "block"; // Aseguramos que sea visible
+    container.innerHTML = '<h2 style="color: white;">Inventario Actual</h2>';
 
-    if (!productos || productos.length === 0) {
-        container.innerHTML += '<p>No hay productos registrados.</p>';
-        return;
-    }
+    // 3. Dibujamos los productos
+    productos.forEach(p => {
+        const div = document.createElement('div');
+        div.style.background = "#2a2a2a";
+        div.style.color = "white";
+        div.style.margin = "10px";
+        div.style.padding = "15px";
+        div.style.borderRadius = "8px";
 
-    productos.forEach(producto => {
-        // Diagnóstico: Imprimimos qué recibimos por cada producto
-        console.log("Producto recibido:", producto);
-
-        const item = document.createElement('div');
-        item.style.border = "1px solid #ddd";
-        item.style.padding = "10px";
-        item.style.margin = "5px";
-        
-        // Aquí usamos "||" para poner un valor por defecto si es NULL
-        const nombre = producto.nombre || producto.Nombre || 'Sin nombre';
-        const precio = producto.precio || producto.Precio || '0';
-
-        item.innerHTML = `
-            <strong>${nombre}</strong><br>
-            Precio: C$ ${precio}
+        // Usamos los nombres de propiedades exactos que vimos en la consola
+        div.innerHTML = `
+            <strong>${p.nombre || 'Sin nombre'}</strong><br>
+            Precio: C$ ${p.precio || '0'} | Stock: ${p.stock || '0'}
         `;
-        container.appendChild(item);
+        container.appendChild(div);
     });
 }
