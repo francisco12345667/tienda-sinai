@@ -2,22 +2,16 @@ export function renderDashboard(productos) {
     const container = document.getElementById('dashboard-container');
     if (!container) return;
 
-    // Esto limpia lo viejo y pone un título
-    container.innerHTML = '<h2 style="color: black; margin-top: 20px;">Inventario en la Nube</h2>';
-
-    // Esto recorre los datos y los pone en pantalla
+    // Esto limpia la pantalla y dibuja los productos que vienen de la nube
+    container.innerHTML = '<h3>Inventario Actual</h3>';
+    
     productos.forEach(p => {
-        const item = document.createElement('div');
-        item.style.border = "1px solid #ccc";
-        item.style.padding = "10px";
-        item.style.marginTop = "10px";
-        item.style.backgroundColor = "white";
-        
-        item.innerHTML = `
-            <strong>${p.nombre || 'Sin nombre'}</strong> - 
-            Precio: ${p.precio || 0} | 
-            Stock: ${p.stock || 0}
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <div style="border:1px solid #ccc; padding:10px; margin:5px;">
+                <strong>${p.nombre}</strong> - Precio: C$ ${p.precio} | Stock: ${p.stock}
+            </div>
         `;
-        container.appendChild(item);
+        container.appendChild(div);
     });
 }
