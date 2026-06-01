@@ -2,13 +2,27 @@ import { StoreActions } from './storeActions.js';
 import { renderDashboard } from './ui.js';
 import { UIHelper } from './uiHelper.js';
 
+// --- CONFIGURACIÓN DE TELEGRAM ---
+const BOT_TOKEN = '7994618598:AAF5yzFnoE1vZaY8buhDlWcrlzwqCQ-HM90';
+const CHAT_ID = '6186375504';
+
+async function enviarNotificacionTelegram(nombre, precio) {
+    const mensaje = `🚨 ¡Nueva venta en Tienda Sinaí!\nProducto: ${nombre}\nPrecio: C$ ${precio}`;
+    try {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(mensaje)}`;
+        await fetch(url);
+        console.log("Notificación enviada a Telegram");
+    } catch (error) {
+        console.error("Error al enviar notificación:", error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Iniciando Tienda Sinaí...');
-    
     UIHelper?.showToast?.('Conectando a la base de datos...');
 
     try {
-        // Esta función se activará automáticamente cada vez que Supabase cambie
+        // Sincronización en tiempo real
         await StoreActions.sincronizarDatos((datos) => {
             console.log('Datos recibidos de Supabase:', datos);
             renderDashboard(datos);
@@ -19,39 +33,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// EVENTO CORREGIDO PARA GUARDAR REALMENTE EN SUPABASE
+// Evento de confirmación de venta
 document.getElementById('btn-confirmar-venta')?.addEventListener('click', async () => {
     try {
-        UIHelper?.showToast?.('Guardando en la nube...');
-
-        // 1. OBTENER DATOS (Asegúrate de que estos IDs existan en tu HTML)
         const nombreInput = document.getElementById('nombre-producto')?.value;
         const precioInput = document.getElementById('precio-producto')?.value;
 
-        // 2. VALIDAR
         if (!nombreInput || !precioInput) {
             UIHelper?.showToast?.('Por favor completa todos los campos');
             return;
         }
 
-        // 3. ENVIAR A SUPABASE (Usando la estructura que espera tu backend)
-        const nuevoProducto = {
-            nombre: nombreInput,
-            precio: parseFloat(precioInput),
-            stock: 1 // o el valor que desees
-        };
+        UIHelper?.showToast?.('Guardando en la nube...');
 
-        // LLAMADA REAL A LA ACCIÓN
-        await StoreActions.saveProduct(nuevoProducto); 
+        // 1. Guardar en Supabase
+        await StoreActions.saveProduct({ 
+            nombre: nombreInput, 
+            precio: parseFloat(precioInput), 
+            stock: 1 
+        });
 
-        UIHelper?.showToast?.('Venta registrada con éxito');
-        
-        // Limpiar formulario tras guardar
+        // 2. Enviar notificación a Telegram
+        await enviarNotificacionTelegram(nombreInput, precioInput);
+
+        UIHelper?.showToast?.('Venta registrada y notificada');
+
+        // Limpiar campos
         document.getElementById('nombre-producto').value = '';
         document.getElementById('precio-producto').value = '';
 
     } catch (error) {
         console.error('Error al guardar:', error);
-        UIHelper?.showToast?.('Error al guardar: ' + error.message);
+        UIHelper?.showToast?.('Error: ' + error.message);
     }
 });
